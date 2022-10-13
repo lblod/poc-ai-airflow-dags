@@ -30,7 +30,7 @@ class Pipeline_args(NamedTuple):
     load_taxo_query: str = None
 
 
-class config(NamedTuple):
+class Config(NamedTuple):
     """
     A config object that contains the Airflow DAG config, but also the custom configuration for the airflow.
     """
@@ -91,7 +91,7 @@ def load_bertopic_retrain_conf():
         load_query=config["load_query"]
     )
 
-    return config(
+    return Config(
         pipeline_args=pipe_arg
     )
 
@@ -131,7 +131,7 @@ def load_bertopic_transform_conf():
         load_query=config["load_query"]
     )
 
-    return config(
+    return Config(
         pipeline_args=pipe_arg
     )
 
@@ -174,7 +174,7 @@ def load_ner_config():
         load_query=config["load_query"]
     )
 
-    return config(
+    return Config(
         pipeline_args=pipe_arg
     )
 
@@ -224,7 +224,7 @@ def load_zeroshot_config():
         load_taxo_query=config["load_taxo_query"]
     )
 
-    return config(
+    return Config(
         pipeline_args=pipe_arg
     )
 
@@ -268,6 +268,6 @@ def load_embed_config():
         load_query=config["load_query"]
     )
 
-    return config(
+    return Config(
         pipeline_args=pipe_arg
     )
