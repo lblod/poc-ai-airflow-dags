@@ -3,12 +3,10 @@ docker_host: tcp://docker-socket-proxy:2375
 auto_remove: True
 network_mode: Bridge
 mounts:
-    - data:
-        target: data
-        source: embed-data
-    - model:
-        target: models
-        source: poc-ai-deployment_model_store
+    - target: data
+      source: embed-data
+    - target: models
+      source: poc-ai-deployment_model_store
 sparql_endpoint: http://192.168.6.152:8892/sparql
 load_query: >
     PREFIX prov: <http://www.w3.org/ns/prov#>
