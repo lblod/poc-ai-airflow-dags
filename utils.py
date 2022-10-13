@@ -5,6 +5,9 @@ import yaml
 from docker.types import Mount
 
 CONFIG_PATH = os.getenv("AIRFLOW_DAG_CONFIG_PATH", "/opt/airflow/git/dags/configs")
+print("===="*25)
+print(CONFIG_PATH)
+print("===="*25)
 
 
 # region util_classes
