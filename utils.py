@@ -86,7 +86,7 @@ def load_bertopic_retrain_conf():
         docker_host=config["docker_host"],
         auto_remove=config["auto_remove"],
         network_mode=config["network_mode"],
-        mount=[Mount(target=obj["target"], source=obj["source"]) for obj in config["mounts"]],
+        mount=[Mount(target=f"/{obj['target']}", source=obj["source"]) for obj in config["mounts"]],
         sparql_endpoint=config["sparql_endpoint"],
         load_query=config["load_query"]
     )
@@ -126,7 +126,7 @@ def load_bertopic_transform_conf():
         docker_host=config["docker_host"],
         auto_remove=config["auto_remove"],
         network_mode=config["network_mode"],
-        mount=[Mount(target=obj["target"], source=obj["source"]) for obj in config["mounts"]],
+        mount=[Mount(target=f"/{obj['target']}", source=obj["source"]) for obj in config["mounts"]],
         sparql_endpoint=config["sparql_endpoint"],
         load_query=config["load_query"]
     )
@@ -169,7 +169,7 @@ def load_ner_config():
         docker_host=config["docker_host"],
         auto_remove=config["auto_remove"],
         network_mode=config["network_mode"],
-        mount=[Mount(target=obj["target"], source=obj["source"]) for obj in config["mounts"]],
+        mount=[Mount(target=f"/{obj['target']}", source=obj["source"]) for obj in config["mounts"]],
         sparql_endpoint=config["sparql_endpoint"],
         load_query=config["load_query"]
     )
@@ -218,7 +218,7 @@ def load_zeroshot_config():
         docker_host=config["docker_host"],
         auto_remove=config["auto_remove"],
         network_mode=config["network_mode"],
-        mount=[Mount(target=obj["target"], source=obj["source"]) for obj in config["mounts"]],
+        mount=[Mount(target=f"/{obj['target']}", source=obj["source"]) for obj in config["mounts"]],
         sparql_endpoint=config["sparql_endpoint"],
         load_query=config["load_query"],
         load_taxo_query=config["load_taxo_query"]
@@ -263,7 +263,7 @@ def load_embed_config():
         docker_host=config["docker_host"],
         auto_remove=config["auto_remove"],
         network_mode=config["network_mode"],
-        mount=[Mount(target=obj["target"], source=obj["source"]) for obj in config["mounts"]],
+        mount=[Mount(target=f"/{obj['target']}", source=obj["source"]) for obj in config["mounts"]],
         sparql_endpoint=config["sparql_endpoint"],
         load_query=config["load_query"]
     )
