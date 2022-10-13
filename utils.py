@@ -4,7 +4,7 @@ from typing import NamedTuple
 import yaml
 from docker.types import Mount
 
-CONFIG_PATH = os.getenv("AIRFLOW_DAG_CONFIG_PATH", "configs")
+CONFIG_PATH = os.getenv("AIRFLOW_DAG_CONFIG_PATH", "/opt/airflow/git/dags/configs")
 
 
 # region util_classes
