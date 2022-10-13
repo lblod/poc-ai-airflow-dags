@@ -1,7 +1,10 @@
 from airflow import DAG
 from airflow.providers.docker.operators.docker import DockerOperator
+from airflow.models import Variable
+import os
 from utils import load_bertopic_transform_conf
 
+os.environ["AIRFLOW_DAG_CONFIG_PATH"] = Variable.get("CONFIG_PATH")
 cfg = load_bertopic_transform_conf()
 
 with DAG(dag_id='bertopic-transform', schedule_interval='0 0 * * *', default_args=cfg.default_config._asdict(), catchup=False) as dag:
