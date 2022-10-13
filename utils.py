@@ -1,15 +1,25 @@
+import os
 from typing import NamedTuple
 
+import yaml
 from docker.types import Mount
+
+CONFIG_PATH = os.getenv("AIRFLOW_DAG_CONFIG_PATH", "configs")
 
 
 # region util_classes
 class Default_args(NamedTuple):
+    """
+    Named tuple that contains the default values for Airflow DAGs
+    """
     start_date: str = "2019-01-01 00:00:00"
     owner: str = "Airflow"
 
 
 class Pipeline_args(NamedTuple):
+    """
+    Extra information that can be configured in the DAG
+    """
     docker_image: str
     docker_host: str
     auto_remove: bool
@@ -21,6 +31,9 @@ class Pipeline_args(NamedTuple):
 
 
 class config(NamedTuple):
+    """
+    A config object that contains the Airflow DAG config, but also the custom configuration for the airflow.
+    """
     pipeline_args: Pipeline_args
     default_config: Default_args = Default_args()
 
@@ -46,6 +59,13 @@ VALUES ?thing {<http://example.com/submissions/10> }
 # endregion
 
 def load_bertopic_retrain_conf():
+    """
+    This function loads the config that is used for the bertopic retrain DAG
+
+    :return: a Pipeline_args object, containing relevant information
+    """
+
+    # TODO: remove load query (currently ignored... we are using the demo yaml request --> change that later!)
     LOAD_QUERY = """
     PREFIX prov: <http://www.w3.org/ns/prov#> 
     PREFIX dct: <http://purl.org/dc/terms/>  
@@ -58,19 +78,17 @@ def load_bertopic_retrain_conf():
     FILTER NOT EXISTS {  ?thing ext:ingestedBy ext:ml2GrowSmartRegulationsTopicModeler  }}
     """
 
-    LOAD_QUERY = DEMO_LOAD_QUERY
+    with open(f'{CONFIG_PATH}/bertopic-retrain.yaml') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
 
     pipe_arg = Pipeline_args(
-        docker_image="lblod/poc-ai-airflow-bertopic:latest",
-        docker_host="tcp://docker-socket-proxy:2375",
-        auto_remove=True,
-        network_mode="bridge",
-        mount=[
-            Mount(target="/data", source="bertopic-retrain-data"),
-            Mount(target="/models", source="airflow_model_store")
-        ],
-        sparql_endpoint="http://192.168.6.152:8892/sparql",
-        load_query=LOAD_QUERY
+        docker_image=config["docker_image"],
+        docker_host=config["docker_host"],
+        auto_remove=config["auto_remove"],
+        network_mode=config["network_mode"],
+        mount=[Mount(target=obj["target"], source=obj["source"]) for obj in config["mounts"]],
+        sparql_endpoint=config["sparql_endpoint"],
+        load_query=config["load_query"]
     )
 
     return config(
@@ -79,6 +97,13 @@ def load_bertopic_retrain_conf():
 
 
 def load_bertopic_transform_conf():
+    """
+    This function loads the config that is used for the bertopic transform DAG
+
+    :return: a Pipeline_args object, containing relevant information
+    """
+
+    # TODO: remove load query (currently ignored... we are using the demo yaml request --> change that later!)
     LOAD_QUERY = """
     PREFIX prov: <http://www.w3.org/ns/prov#> 
     PREFIX dct: <http://purl.org/dc/terms/>  
@@ -93,17 +118,17 @@ def load_bertopic_transform_conf():
 
     LOAD_QUERY = DEMO_LOAD_QUERY
 
+    with open(f'{CONFIG_PATH}/bertopic-transform.yaml') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+
     pipe_arg = Pipeline_args(
-        docker_image="lblod/poc-ai-airflow-bertopic:latest",
-        docker_host="tcp://docker-socket-proxy:2375",
-        auto_remove=True,
-        network_mode="bridge",
-        mount=[
-            Mount(target="/data", source="bertopic-transform-data"),
-            Mount(target="/models", source="airflow_model_store")
-        ],
-        sparql_endpoint="http://192.168.6.152:8892/sparql",
-        load_query=LOAD_QUERY
+        docker_image=config["docker_image"],
+        docker_host=config["docker_host"],
+        auto_remove=config["auto_remove"],
+        network_mode=config["network_mode"],
+        mount=[Mount(target=obj["target"], source=obj["source"]) for obj in config["mounts"]],
+        sparql_endpoint=config["sparql_endpoint"],
+        load_query=config["load_query"]
     )
 
     return config(
@@ -112,6 +137,13 @@ def load_bertopic_transform_conf():
 
 
 def load_ner_config():
+    """
+    This function loads the config that is used for the ner DAG
+
+    :return: a Pipeline_args object, containing relevant information
+    """
+
+    # TODO: remove load query (currently ignored... we are using the demo yaml request --> change that later!)
     LOAD_QUERY = """
     PREFIX prov: <http://www.w3.org/ns/prov#> 
     PREFIX dct: <http://purl.org/dc/terms/>  
@@ -129,17 +161,17 @@ def load_ner_config():
 
     # LOAD_QUERY = """PREFIX prov: <http://www.w3.org/ns/prov#>PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>SELECT ?s ?content WHERE {  ?s a besluit:Besluit ;    prov:value ?content. FILTER (STRLEN(?content) >= 100)} LIMIT 10"""
 
+    with open(f'{CONFIG_PATH}/ner.yaml') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+
     pipe_arg = Pipeline_args(
-        docker_image="lblod/poc-ai-airflow-ner:latest",
-        docker_host="tcp://docker-socket-proxy:2375",
-        auto_remove=True,
-        network_mode="bridge",
-        mount=[
-            Mount(target="/data", source="ner-data"),
-            Mount(target="/models", source="airflow_model_store")
-        ],
-        sparql_endpoint="http://192.168.6.152:8892/sparql",  # "https://qa.centrale-vindplaats.lblod.info/sparql"
-        load_query=LOAD_QUERY
+        docker_image=config["docker_image"],
+        docker_host=config["docker_host"],
+        auto_remove=config["auto_remove"],
+        network_mode=config["network_mode"],
+        mount=[Mount(target=obj["target"], source=obj["source"]) for obj in config["mounts"]],
+        sparql_endpoint=config["sparql_endpoint"],
+        load_query=config["load_query"]
     )
 
     return config(
@@ -148,6 +180,13 @@ def load_ner_config():
 
 
 def load_zeroshot_config():
+    """
+    This function loads the config that is used for the zeroshot DAG
+
+    :return: a Pipeline_args object, containing relevant information
+    """
+
+    # TODO: remove load query (currently ignored... we are using the demo yaml request --> change that later!)
     LOAD_QUERY = """
         PREFIX prov: <http://www.w3.org/ns/prov#> 
         PREFIX dct: <http://purl.org/dc/terms/>  
@@ -171,19 +210,18 @@ def load_zeroshot_config():
     ?taxo ext:nl_taxonomy ?nl
     }
     """
+    with open(f'{CONFIG_PATH}/zeroshot.yaml') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
 
     pipe_arg = Pipeline_args(
-        docker_image="lblod/poc-ai-airflow-zeroshot:latest",
-        docker_host="tcp://docker-socket-proxy:2375",
-        auto_remove=True,
-        network_mode="bridge",
-        mount=[
-            Mount(target="/data", source="zeroshot-data"),
-            Mount(target="/models", source="airflow_model_store")
-        ],
-        sparql_endpoint="http://192.168.6.152:8892/sparql",  # "https://qa.centrale-vindplaats.lblod.info/sparql"
-        load_query=LOAD_QUERY,
-        load_taxo_query=LOAD_TAXO_QUERY
+        docker_image=config["docker_image"],
+        docker_host=config["docker_host"],
+        auto_remove=config["auto_remove"],
+        network_mode=config["network_mode"],
+        mount=[Mount(target=obj["target"], source=obj["source"]) for obj in config["mounts"]],
+        sparql_endpoint=config["sparql_endpoint"],
+        load_query=config["load_query"],
+        load_taxo_query=config["load_taxo_query"]
     )
 
     return config(
@@ -192,6 +230,13 @@ def load_zeroshot_config():
 
 
 def load_embed_config():
+    """
+    This function loads the config that is used for the bertopic embedding DAG
+
+    :return: a Pipeline_args object, containing relevant information
+    """
+
+    # TODO: remove load query (currently ignored... we are using the demo yaml request --> change that later!)
     LOAD_QUERY = """
         PREFIX prov: <http://www.w3.org/ns/prov#> 
         PREFIX dct: <http://purl.org/dc/terms/>  
@@ -210,17 +255,17 @@ def load_embed_config():
     # <http://www.w3.org/2000/01/rdf-schema#>SELECT ?s ?content WHERE {  ?s a besluit:Besluit ;    prov:value
     # ?content. FILTER (STRLEN(?content) >= 100)} LIMIT 10"""
 
+    with open(f'{CONFIG_PATH}/embed.yaml') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+
     pipe_arg = Pipeline_args(
-        docker_image="lblod/poc-ai-airflow-embed:latest",
-        docker_host="tcp://docker-socket-proxy:2375",
-        auto_remove=True,
-        network_mode="bridge",
-        mount=[
-            Mount(target="/data", source="embed-data"),
-            Mount(target="/models", source="airflow_model_store")
-        ],
-        sparql_endpoint="http://192.168.6.152:8892/sparql",  # "https://qa.centrale-vindplaats.lblod.info/sparql"
-        load_query=LOAD_QUERY
+        docker_image=config["docker_image"],
+        docker_host=config["docker_host"],
+        auto_remove=config["auto_remove"],
+        network_mode=config["network_mode"],
+        mount=[Mount(target=obj["target"], source=obj["source"]) for obj in config["mounts"]],
+        sparql_endpoint=config["sparql_endpoint"],
+        load_query=config["load_query"]
     )
 
     return config(
