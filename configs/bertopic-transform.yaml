@@ -1,13 +1,13 @@
-docker_image: lblod/poc-ai-airflow-bertopic:latest
-docker_host: tcp://docker-socket-proxy:2375
-auto_remove: True
-network_mode: Bridge
+docker_image: "lblod/poc-ai-airflow-bertopic:latest"
+docker_host: "tcp://docker-socket-proxy:2375"
+auto_remove: "True"
+network_mode: "bridge"
 mounts:
-    - target: data
-      source: bertopic-transform-data
-    - target: models
-      source: poc-ai-deployment_model_store
-sparql_endpoint: http://192.168.6.152:8892/sparql
+    - target: "data"
+      source: "bertopic-transform-data"
+    - target: "models"
+      source: "poc-ai-deployment_model_store"
+sparql_endpoint: "http://192.168.6.152:8892/sparql"
 load_query: >
     PREFIX prov: <http://www.w3.org/ns/prov#>
     PREFIX dct: <http://purl.org/dc/terms/>
