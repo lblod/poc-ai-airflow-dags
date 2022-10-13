@@ -1,13 +1,12 @@
-import os
 from typing import NamedTuple
-
+from airflow.models import Variable
 import yaml
 from docker.types import Mount
 
-CONFIG_PATH = os.getenv("AIRFLOW_DAG_CONFIG_PATH", "/opt/airflow/git/dags/configs")
-print("===="*25)
-print(CONFIG_PATH)
-print("===="*25)
+def get_config_path():
+    config_path = Variable.get("CONFIG_PATH")
+    print("==="*25, f"\n{config_path}\n",  "==="*25)
+    return config_path
 
 
 # region util_classes
@@ -81,7 +80,7 @@ def load_bertopic_retrain_conf():
     FILTER NOT EXISTS {  ?thing ext:ingestedBy ext:ml2GrowSmartRegulationsTopicModeler  }}
     """
 
-    with open(f'{CONFIG_PATH}/bertopic-retrain.yaml') as f:
+    with open(f'{get_config_path()}/bertopic-retrain.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     pipe_arg = Pipeline_args(
@@ -121,7 +120,7 @@ def load_bertopic_transform_conf():
 
     LOAD_QUERY = DEMO_LOAD_QUERY
 
-    with open(f'{CONFIG_PATH}/bertopic-transform.yaml') as f:
+    with open(f'{get_config_path()}/bertopic-transform.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     pipe_arg = Pipeline_args(
@@ -164,7 +163,7 @@ def load_ner_config():
 
     # LOAD_QUERY = """PREFIX prov: <http://www.w3.org/ns/prov#>PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>SELECT ?s ?content WHERE {  ?s a besluit:Besluit ;    prov:value ?content. FILTER (STRLEN(?content) >= 100)} LIMIT 10"""
 
-    with open(f'{CONFIG_PATH}/ner.yaml') as f:
+    with open(f'{get_config_path()}/ner.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     pipe_arg = Pipeline_args(
@@ -213,7 +212,7 @@ def load_zeroshot_config():
     ?taxo ext:nl_taxonomy ?nl
     }
     """
-    with open(f'{CONFIG_PATH}/zeroshot.yaml') as f:
+    with open(f'{get_config_path()}/zeroshot.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     pipe_arg = Pipeline_args(
@@ -258,7 +257,7 @@ def load_embed_config():
     # <http://www.w3.org/2000/01/rdf-schema#>SELECT ?s ?content WHERE {  ?s a besluit:Besluit ;    prov:value
     # ?content. FILTER (STRLEN(?content) >= 100)} LIMIT 10"""
 
-    with open(f'{CONFIG_PATH}/embed.yaml') as f:
+    with open(f'{get_config_path()}/embed.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     pipe_arg = Pipeline_args(

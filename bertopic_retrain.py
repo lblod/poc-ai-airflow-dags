@@ -1,10 +1,6 @@
 from airflow import DAG
 from airflow.providers.docker.operators.docker import DockerOperator
-from airflow.models import Variable
-import os
 from utils import load_bertopic_retrain_conf
-
-os.environ["AIRFLOW_DAG_CONFIG_PATH"] = Variable.get("CONFIG_PATH")
 
 cfg = load_bertopic_retrain_conf()
 
