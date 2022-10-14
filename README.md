@@ -14,7 +14,7 @@ git clone https://github.com/lblod/poc-ai-airflow-dags.git
 
 Once you have cloned the repository and moved it to correct folder for airflow (see [airflow documentation](https://https://airflow.apache.org/docs/apache-airflow/stable/concepts/dags.html)), you should be able to see the following DAGs in your Airflow interface.
 
-![screenshot of airflow interface](https://github.com/lblod/poc-ai-airflow-dags/images/Airflow_DAGs_screenshot.png)
+![screenshot of airflow interface](https://github.com/lblod/poc-ai-airflow-dags/blob/master/images/Airflow_DAGs_screenshot.png)
 
 If you get the same interface as the screenshot above, you can start running the dags
 
