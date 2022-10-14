@@ -23,7 +23,7 @@ In case you want to customize certain setups, you should not make changes to thi
 1. Duplicate the content the [config/ folder](https://github.com/lblod/poc-ai-airflow-dags/tree/master/configs)
 2. Adapt it to your needs (do not change file names, only adapt the values in the `*.yaml` files)
 3. Mount the new config into `poc-ai-deployment-airflow-worker-1`, keep track of what folder you mounted the new configs in.
-4. Set an Airflow variable (under `Admin > Variables`)  to the path you mounted your new configs in. AFter the DAG refresh, your DAGs should be reloaded from the mounted config.
+4. Set an Airflow variable (under `Admin > Variables`)  to the path you mounted your new configs in. After the DAG refresh, your DAGs should be reloaded from the mounted config.
 5. Verify if everything worked as intended by waiting for the DAG refresh and validating that you did not make an error.
 
 ## Information about configs
