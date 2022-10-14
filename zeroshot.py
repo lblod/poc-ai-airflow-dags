@@ -39,6 +39,7 @@ with DAG(dag_id='zeroshot', schedule_interval='0 0 * * *', default_args=cfg.defa
             "export"
         ],
         network_mode=cfg.pipeline_args.network_mode,
+        force_pull=True,
         auto_remove=cfg.pipeline_args.auto_remove,
         mounts=cfg.pipeline_args.mount
     )
