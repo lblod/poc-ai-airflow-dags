@@ -4,7 +4,7 @@ import yaml
 from docker.types import Mount
 
 def get_config_path():
-    config_path = Variable.get("CONFIG_PATH")
+    config_path = Variable.get("CONFIG_PATH", default_var="/opt/airflow/git/dags/configs")
     print("==="*25, f"\n{config_path}\n",  "==="*25)
     return config_path
 
