@@ -1,6 +1,6 @@
 docker_image: "lblod/poc-ai-airflow-bertopic:latest"
 docker_host: "tcp://docker-socket-proxy:2375"
-auto_remove: "True"
+auto_remove: "force"
 network_mode: "bridge"
 mounts:
     - target: "data"
