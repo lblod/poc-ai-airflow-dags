@@ -1,5 +1,6 @@
 from airflow import DAG
-from airflow.providers.docker.operators.docker import DockerOperator, BashOperator
+from airflow.providers.docker.operators.docker import DockerOperator
+from airflow.operators.bash import BashOperator
 from utils import load_bertopic_retrain_conf
 
 cfg = load_bertopic_retrain_conf()
