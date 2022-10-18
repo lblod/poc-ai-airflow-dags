@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.providers.docker.operators.docker import DockerOperator
+from airflow.providers.docker.operators.docker import DockerOperator, BashOperator
 from utils import load_bertopic_retrain_conf
 
 cfg = load_bertopic_retrain_conf()
@@ -36,6 +36,12 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
         network_mode=cfg.pipeline_args.network_mode,
         auto_remove=cfg.pipeline_args.auto_remove,
         mounts=cfg.pipeline_args.mount
+    )
+
+    restart_operator = BashOperator(
+        task_id='reboot topic api',
+        bash_command= 'curl -X POST "http://docker-socket-proxy:2375/containers/lblod-bertopic-api/restart"',
+
     )
 
     task_transform = DockerOperator(
@@ -82,4 +88,4 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
         mounts=cfg.pipeline_args.mount
     )
 
-    task_load >> task_retrain_and_save >> task_transform >> [task_save_transform, task_save_topics]
+    task_load >> task_retrain_and_save >> restart_operator >> task_transform >> [task_save_transform, task_save_topics]
