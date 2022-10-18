@@ -40,7 +40,7 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
     )
 
     restart_operator = BashOperator(
-        task_id='reboot topic api',
+        task_id='reboot-topic-api',
         bash_command= 'curl -X POST "http://docker-socket-proxy:2375/containers/lblod-bertopic-api/restart"',
 
     )
