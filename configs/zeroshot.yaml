@@ -15,14 +15,10 @@ load_query: >
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 
 
-    SELECT ?thing ?text WHERE {
-        VALUES ?thing {<http://example.com/submissions/10> }
-        GRAPH <http://mu.semte.ch/application> {
-            ?thing prov:generated ?gen .
-            ?gen dct:hasPart ?part.
-            ?part soic:content ?text.
-            FILTER NOT EXISTS {  ?thing ext:ingestedMl2GrowSmartRegulationsBBC "1" }
-        }
+    SELECT DISTINCT ?thing ?text WHERE {
+        ?thing a <http://rdf.myexperiment.org/ontologies/base/Submission>; prov:generated/dct:hasPart ?part.    
+        ?part soic:content ?text.  
+        FILTER NOT EXISTS {  ?thing ext:ingestedMl2GrowSmartRegulationsBBC "1" }
     }
 load_taxo_query: >
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
