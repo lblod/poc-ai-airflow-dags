@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.providers.docker.operators.docker import DockerOperator
+from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from airflow.operators.bash import BashOperator
 from utils import load_bertopic_retrain_conf
 
@@ -7,36 +7,29 @@ cfg = load_bertopic_retrain_conf()
 
 with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=cfg.default_config._asdict(), catchup=False) as dag:
 
-    task_load = DockerOperator(
-        docker_url=cfg.pipeline_args.docker_host,
-        container_name="abb-bertopic-load",
-        image=cfg.pipeline_args.docker_image,
+    task_load = KubernetesPodOperator(
+        name="abb-bertopic-load",
+        image=cfg.pipeline_args.image,
         task_id="load",
-        command=[
+        cmds=[
             "python3",
             "load.py",
             cfg.pipeline_args.sparql_endpoint,
             cfg.pipeline_args.load_query
         ],
-        network_mode=cfg.pipeline_args.network_mode,
-        force_pull=True,
-        auto_remove=cfg.pipeline_args.auto_remove,
-        mounts=cfg.pipeline_args.mount
+        volume_mounts=cfg.pipeline_args.mount
 
     )
 
-    task_retrain_and_save = DockerOperator(
-        docker_url=cfg.pipeline_args.docker_host,
-        container_name="abb-bertopic-retrain",
-        image=cfg.pipeline_args.docker_image,
+    task_retrain_and_save = KubernetesPodOperator(
+        name="abb-bertopic-retrain",
+        image=cfg.pipeline_args.image,
         task_id="retrain",
-        command=[
+        cmds=[
             "python3",
             "retrain.py"
         ],
-        network_mode=cfg.pipeline_args.network_mode,
-        auto_remove=cfg.pipeline_args.auto_remove,
-        mounts=cfg.pipeline_args.mount
+        volume_mounts=cfg.pipeline_args.mount
     )
 
     restart_operator = BashOperator(
@@ -45,48 +38,39 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
 
     )
 
-    task_transform = DockerOperator(
-        docker_url=cfg.pipeline_args.docker_host,
-        container_name="abb-bertopic-transform",
-        image=cfg.pipeline_args.docker_image,
+    task_transform = KubernetesPodOperator(
+        name="abb-bertopic-transform",
+        image=cfg.pipeline_args.image,
         task_id="transform",
-        command=[
+        cmds=[
             "python3",
             "transform.py"
         ],
-        network_mode=cfg.pipeline_args.network_mode,
-        auto_remove=cfg.pipeline_args.auto_remove,
-        mounts=cfg.pipeline_args.mount
+        volume_mounts=cfg.pipeline_args.mount
     )
 
-    task_save_topics = DockerOperator(
-        docker_url=cfg.pipeline_args.docker_host,
-        container_name="abb-bertopic-save_topics",
-        image=cfg.pipeline_args.docker_image,
+    task_save_topics = KubernetesPodOperator(
+        name="abb-bertopic-save_topics",
+        image=cfg.pipeline_args.image,
         task_id="save_topics",
-        command=[
+        cmds=[
             "python3",
             "save_topics.py",
             cfg.pipeline_args.sparql_endpoint,
         ],
-        network_mode=cfg.pipeline_args.network_mode,
-        auto_remove=cfg.pipeline_args.auto_remove,
-        mounts=cfg.pipeline_args.mount
+        volume_mounts=cfg.pipeline_args.mount
     )
 
-    task_save_transform = DockerOperator(
-        docker_url=cfg.pipeline_args.docker_host,
+    task_save_transform = KubernetesPodOperator(
         container_name="abb-bertopic-save_transform",
-        image=cfg.pipeline_args.docker_image,
+        image=cfg.pipeline_args.image,
         task_id="save_documents",
-        command=[
+        cmds=[
             "python3",
             "save_transform.py",
             cfg.pipeline_args.sparql_endpoint,
         ],
-        network_mode=cfg.pipeline_args.network_mode,
-        auto_remove=cfg.pipeline_args.auto_remove,
-        mounts=cfg.pipeline_args.mount
+        volume_mounts=cfg.pipeline_args.mount
     )
 
     task_load >> task_retrain_and_save >> restart_operator >> task_transform >> [task_save_transform, task_save_topics]

@@ -1,7 +1,4 @@
-docker_image: "lblod/poc-ai-airflow-zeroshot:latest"
-docker_host: "tcp://docker-socket-proxy:2375"
-auto_remove: "force"
-network_mode: "bridge"
+image: "lblod/poc-ai-airflow-zeroshot:latest"
 mounts:
     - target: "data"
       source: "zeroshot-data"
@@ -27,9 +24,3 @@ load_taxo_query: >
         <http://data.lblod.info/ML2GrowClassification> ?o ?taxo.
         ?taxo ext:nl_taxonomy ?nl
     }
-
-
-
-  
-  
-  

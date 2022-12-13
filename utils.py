@@ -1,16 +1,15 @@
 from typing import NamedTuple
 from airflow.models import Variable
+from kubernetes.client import models as k8s
 import yaml
-from docker.types import Mount
 
 def get_config_path():
     config_path = Variable.get("CONFIG_PATH", default_var="/opt/airflow/git/dags/configs")
-    print("==="*25, f"\n{config_path}\n",  "==="*25)
+    print("==="*25, f"\n{config_path}\n", "==="*25)
     return config_path
 
 
-# region util_classes
-class Default_args(NamedTuple):
+class DefaultArgs(NamedTuple):
     """
     Named tuple that contains the default values for Airflow DAGs
     """
@@ -18,15 +17,12 @@ class Default_args(NamedTuple):
     owner: str = "Airflow"
 
 
-class Pipeline_args(NamedTuple):
+class PipelineArgs(NamedTuple):
     """
     Extra information that can be configured in the DAG
     """
-    docker_image: str
-    docker_host: str
-    auto_remove: bool
-    network_mode: str
-    mount: list
+    image: str
+    mount: list[k8s.V1VolumeMount]
     sparql_endpoint: str
     load_query: str
     load_taxo_query: str = None
@@ -36,191 +32,17 @@ class Config(NamedTuple):
     """
     A config object that contains the Airflow DAG config, but also the custom configuration for the airflow.
     """
-    pipeline_args: Pipeline_args
-    default_config: Default_args = Default_args()
+    pipeline_args: PipelineArgs
+    default_config: DefaultArgs = DefaultArgs()
 
 
-DEMO_LOAD_QUERY = """
-PREFIX prov: <http://www.w3.org/ns/prov#>
-PREFIX dct: <http://purl.org/dc/terms/>
-PREFIX soic: <http://rdfs.org/sioc/ns#>
-PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
-
-
-SELECT ?thing ?text WHERE {
-VALUES ?thing {<http://example.com/submissions/10> }
-  GRAPH <http://mu.semte.ch/application> {
-     ?thing prov:generated ?gen .
-?gen dct:hasPart ?part.
-?part soic:content ?text.
-  }
-}
-"""
-
-
-# endregion
-
-def load_bertopic_retrain_conf():
-    """
-    This function loads the config that is used for the bertopic retrain DAG
-
-    :return: a Pipeline_args object, containing relevant information
-    """
-
-    # TODO: remove load query (currently ignored... we are using the demo yaml request --> change that later!)
-    LOAD_QUERY = """
-    PREFIX prov: <http://www.w3.org/ns/prov#> 
-    PREFIX dct: <http://purl.org/dc/terms/>  
-    PREFIX soic: <http://rdfs.org/sioc/ns#>  
-    PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>  
-    
-    SELECT DISTINCT ?thing ?part ?text WHERE {
-    ?thing a <http://rdf.myexperiment.org/ontologies/base/Submission>; prov:generated/dct:hasPart ?part.    
-    ?part soic:content ?text.  
-    FILTER NOT EXISTS {  ?thing ext:ingestedBy ext:ml2GrowSmartRegulationsTopicModeler  }}
-    """
-
-    with open(f'{get_config_path()}/bertopic-retrain.yaml') as f:
+def create_config_from_yaml(file_name: str):
+    with open(f'{get_config_path()}/{file_name}') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
-    pipe_arg = Pipeline_args(
-        docker_image=config["docker_image"],
-        docker_host=config["docker_host"],
-        auto_remove=config["auto_remove"],
-        network_mode=config["network_mode"],
-        mount=[Mount(target=f"/{obj['target']}", source=obj["source"]) for obj in config["mounts"]],
-        sparql_endpoint=config["sparql_endpoint"],
-        load_query=config["load_query"]
-    )
-
-    return Config(
-        pipeline_args=pipe_arg
-    )
-
-
-def load_bertopic_transform_conf():
-    """
-    This function loads the config that is used for the bertopic transform DAG
-
-    :return: a Pipeline_args object, containing relevant information
-    """
-
-    # TODO: remove load query (currently ignored... we are using the demo yaml request --> change that later!)
-    LOAD_QUERY = """
-    PREFIX prov: <http://www.w3.org/ns/prov#> 
-    PREFIX dct: <http://purl.org/dc/terms/>  
-    PREFIX soic: <http://rdfs.org/sioc/ns#>  
-    PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>  
-
-    SELECT DISTINCT ?thing ?part ?text WHERE {
-    ?thing a <http://rdf.myexperiment.org/ontologies/base/Submission>; prov:generated/dct:hasPart ?part.    
-    ?part soic:content ?text.  
-    FILTER NOT EXISTS {  ?thing ext:ingestedBy ext:ml2GrowSmartRegulationsTopicModeler  } }  LIMIT 500
-    """
-
-    LOAD_QUERY = DEMO_LOAD_QUERY
-
-    with open(f'{get_config_path()}/bertopic-transform.yaml') as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
-
-    pipe_arg = Pipeline_args(
-        docker_image=config["docker_image"],
-        docker_host=config["docker_host"],
-        auto_remove=config["auto_remove"],
-        network_mode=config["network_mode"],
-        mount=[Mount(target=f"/{obj['target']}", source=obj["source"]) for obj in config["mounts"]],
-        sparql_endpoint=config["sparql_endpoint"],
-        load_query=config["load_query"]
-    )
-
-    return Config(
-        pipeline_args=pipe_arg
-    )
-
-
-def load_ner_config():
-    """
-    This function loads the config that is used for the ner DAG
-
-    :return: a Pipeline_args object, containing relevant information
-    """
-
-    # TODO: remove load query (currently ignored... we are using the demo yaml request --> change that later!)
-    LOAD_QUERY = """
-    PREFIX prov: <http://www.w3.org/ns/prov#> 
-    PREFIX dct: <http://purl.org/dc/terms/>  
-    PREFIX soic: <http://rdfs.org/sioc/ns#>  
-    PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>  
-
-    SELECT DISTINCT ?thing ?part ?text WHERE {
-    ?thing a <http://rdf.myexperiment.org/ontologies/base/Submission>; prov:generated/dct:hasPart ?part.    
-    ?part soic:content ?text.  }
-    """
-
-    LOAD_QUERY = DEMO_LOAD_QUERY
-
-    #    FILTER NOT EXISTS {  ?thing ext:ingestedBy ext:ml2GrowSmartRegulationsTopicModeler  } }  LIMIT 50
-
-    # LOAD_QUERY = """PREFIX prov: <http://www.w3.org/ns/prov#>PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>SELECT ?s ?content WHERE {  ?s a besluit:Besluit ;    prov:value ?content. FILTER (STRLEN(?content) >= 100)} LIMIT 10"""
-
-    with open(f'{get_config_path()}/ner.yaml') as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
-
-    pipe_arg = Pipeline_args(
-        docker_image=config["docker_image"],
-        docker_host=config["docker_host"],
-        auto_remove=config["auto_remove"],
-        network_mode=config["network_mode"],
-        mount=[Mount(target=f"/{obj['target']}", source=obj["source"]) for obj in config["mounts"]],
-        sparql_endpoint=config["sparql_endpoint"],
-        load_query=config["load_query"]
-    )
-
-    return Config(
-        pipeline_args=pipe_arg
-    )
-
-
-def load_zeroshot_config():
-    """
-    This function loads the config that is used for the zeroshot DAG
-
-    :return: a Pipeline_args object, containing relevant information
-    """
-
-    # TODO: remove load query (currently ignored... we are using the demo yaml request --> change that later!)
-    LOAD_QUERY = """
-        PREFIX prov: <http://www.w3.org/ns/prov#> 
-        PREFIX dct: <http://purl.org/dc/terms/>  
-        PREFIX soic: <http://rdfs.org/sioc/ns#>  
-        PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>  
-
-        SELECT DISTINCT ?thing ?part ?text WHERE {
-        ?thing a <http://rdf.myexperiment.org/ontologies/base/Submission>; prov:generated/dct:hasPart ?part.    
-        ?part soic:content ?text.  
-        FILTER NOT EXISTS {  ?thing ext:ingestedBy ext:ingestedMl2GrowSmartRegulationsBBC  }}
-        """
-
-    LOAD_QUERY = DEMO_LOAD_QUERY
-    # LOAD_QUERY = """PREFIX prov: <http://www.w3.org/ns/prov#>PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>SELECT ?s ?content WHERE {  ?s a besluit:Besluit ;    prov:value ?content. FILTER (STRLEN(?content) >= 100)} LIMIT 10"""
-
-    LOAD_TAXO_QUERY = """
-    PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
-
-    SELECT ?nl WHERE {
-        <http://data.lblod.info/ML2GrowClassification> ?o ?taxo.
-    ?taxo ext:nl_taxonomy ?nl
-    }
-    """
-    with open(f'{get_config_path()}/zeroshot.yaml') as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
-
-    pipe_arg = Pipeline_args(
-        docker_image=config["docker_image"],
-        docker_host=config["docker_host"],
-        auto_remove=config["auto_remove"],
-        network_mode=config["network_mode"],
-        mount=[Mount(target=f"/{obj['target']}", source=obj["source"]) for obj in config["mounts"]],
+    pipe_arg = PipelineArgs(
+        image=config["image"],
+        mount=[k8s.V1VolumeMount(mount_path=f"/{obj['target']}", name=obj["source"]) for obj in config["mounts"]],
         sparql_endpoint=config["sparql_endpoint"],
         load_query=config["load_query"],
         load_taxo_query=config["load_taxo_query"]
@@ -231,6 +53,46 @@ def load_zeroshot_config():
     )
 
 
+def load_bertopic_retrain_conf():
+    """
+    This function loads the config that is used for the bertopic retrain DAG
+
+    :return: a Pipeline_args object, containing relevant information
+    """
+
+    return create_config_from_yaml("bertopic-retrain.yaml")
+
+
+def load_bertopic_transform_conf():
+    """
+    This function loads the config that is used for the bertopic transform DAG
+
+    :return: a Pipeline_args object, containing relevant information
+    """
+
+    return create_config_from_yaml("bertopic-transform.yaml")
+
+
+def load_ner_config():
+    """
+    This function loads the config that is used for the ner DAG
+
+    :return: a Pipeline_args object, containing relevant information
+    """
+
+    return create_config_from_yaml("ner.yaml")
+
+
+def load_zeroshot_config():
+    """
+    This function loads the config that is used for the zeroshot DAG
+
+    :return: a Pipeline_args object, containing relevant information
+    """
+
+    return create_config_from_yaml("zeroshot.yaml")
+
+
 def load_embed_config():
     """
     This function loads the config that is used for the bertopic embedding DAG
@@ -238,38 +100,4 @@ def load_embed_config():
     :return: a Pipeline_args object, containing relevant information
     """
 
-    # TODO: remove load query (currently ignored... we are using the demo yaml request --> change that later!)
-    LOAD_QUERY = """
-        PREFIX prov: <http://www.w3.org/ns/prov#> 
-        PREFIX dct: <http://purl.org/dc/terms/>  
-        PREFIX soic: <http://rdfs.org/sioc/ns#>  
-        PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>  
-
-        SELECT DISTINCT ?thing ?part ?text WHERE {
-        ?thing a <http://rdf.myexperiment.org/ontologies/base/Submission>; prov:generated/dct:hasPart ?part.    
-        ?part soic:content ?text.  
-        FILTER NOT EXISTS {  ?thing ext:ingestedBy ext:ml2GrowSmartRegulationsTopicModeler  } } 
-        """
-    LOAD_QUERY = DEMO_LOAD_QUERY
-
-    # LOAD_QUERY = """PREFIX prov: <http://www.w3.org/ns/prov#>PREFIX besluit:
-    # <http://data.vlaanderen.be/ns/besluit#>PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>PREFIX rdfs:
-    # <http://www.w3.org/2000/01/rdf-schema#>SELECT ?s ?content WHERE {  ?s a besluit:Besluit ;    prov:value
-    # ?content. FILTER (STRLEN(?content) >= 100)} LIMIT 10"""
-
-    with open(f'{get_config_path()}/embed.yaml') as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
-
-    pipe_arg = Pipeline_args(
-        docker_image=config["docker_image"],
-        docker_host=config["docker_host"],
-        auto_remove=config["auto_remove"],
-        network_mode=config["network_mode"],
-        mount=[Mount(target=f"/{obj['target']}", source=obj["source"]) for obj in config["mounts"]],
-        sparql_endpoint=config["sparql_endpoint"],
-        load_query=config["load_query"]
-    )
-
-    return Config(
-        pipeline_args=pipe_arg
-    )
+    return create_config_from_yaml("embed.yaml")
