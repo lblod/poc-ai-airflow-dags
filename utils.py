@@ -22,7 +22,7 @@ class PipelineArgs(NamedTuple):
     Extra information that can be configured in the DAG
     """
     image: str
-    mount: list[k8s.V1VolumeMount]
+    mount: list
     sparql_endpoint: str
     load_query: str
     load_taxo_query: str = None
