@@ -45,7 +45,7 @@ def create_config_from_yaml(file_name: str):
         mount=[k8s.V1VolumeMount(mount_path=f"/{obj['target']}", name=obj["source"]) for obj in config["mounts"]],
         sparql_endpoint=config["sparql_endpoint"],
         load_query=config["load_query"],
-        load_taxo_query=config["load_taxo_query"]
+        load_taxo_query=config.get("load_taxo_query")
     )
 
     return Config(
