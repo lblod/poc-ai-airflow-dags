@@ -62,7 +62,7 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
     )
 
     task_save_transform = KubernetesPodOperator(
-        container_name="abb-bertopic-save_transform",
+        name="abb-bertopic-save_transform",
         image=cfg.pipeline_args.image,
         task_id="save_documents",
         cmds=[
