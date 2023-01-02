@@ -1,9 +1,9 @@
 image: "lblod/poc-ai-airflow-bertopic:latest"
 mounts:
-    - target: "data"
-      source: "bertopic-retrain-data"
-    - target: "models"
-      source: "poc-ai-deployment_model_store"
+  - target: "data"
+    source: "bertopic-retrain-data"
+  - target: "models"
+    source: "poc-ai-deployment_model_store"
 sparql_endpoint: "http://192.168.6.152:8892/sparql"
 load_query: >
     PREFIX prov: <http://www.w3.org/ns/prov#> 

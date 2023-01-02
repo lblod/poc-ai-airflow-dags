@@ -23,6 +23,7 @@ class PipelineArgs(NamedTuple):
     """
     image: str
     mount: list
+    volumes: list
     sparql_endpoint: str
     load_query: str
     load_taxo_query: str = None
@@ -42,6 +43,7 @@ def create_config_from_yaml(file_name: str):
 
     pipe_arg = PipelineArgs(
         image=config["image"],
+        volumes=[k8s.V1Volume(name=obj["source"], persistent_volume_claim=k8s.V1PersistentVolumeClaimVolumeSource(claim_name=obj["source"])) for obj in config["mounts"]],
         mount=[k8s.V1VolumeMount(mount_path=f"/{obj['target']}", name=obj["source"]) for obj in config["mounts"]],
         sparql_endpoint=config["sparql_endpoint"],
         load_query=config["load_query"],

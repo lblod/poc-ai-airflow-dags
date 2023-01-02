@@ -16,6 +16,7 @@ with DAG(dag_id='ner', schedule_interval='0 0 * * *', default_args=cfg.default_c
             cfg.pipeline_args.sparql_endpoint,
             cfg.pipeline_args.load_query
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
@@ -28,6 +29,7 @@ with DAG(dag_id='ner', schedule_interval='0 0 * * *', default_args=cfg.default_c
             "python3",
             "ner.py"
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
@@ -41,6 +43,7 @@ with DAG(dag_id='ner', schedule_interval='0 0 * * *', default_args=cfg.default_c
             "save.py",
             cfg.pipeline_args.sparql_endpoint
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
