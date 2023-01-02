@@ -1,8 +1,8 @@
 image: "lblod/poc-ai-airflow-zeroshot:latest"
 mounts:
-- target: "data"
+  - target: "data"
     source: "zeroshot-data"
-- target: "models"
+  - target: "models"
     source: "poc-ai-deployment_model_store"
 sparql_endpoint: "http://192.168.6.152:8892/sparql"
 load_query: >
