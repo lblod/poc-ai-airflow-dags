@@ -6,6 +6,7 @@ cfg = load_ner_config()
 
 with DAG(dag_id='ner', schedule_interval='0 0 * * *', default_args=cfg.default_config._asdict(), catchup=False) as dag:
     task_load = KubernetesPodOperator(
+        namespace="abb",
         name="ner-load",
         image=cfg.pipeline_args.image,
         task_id="load",
@@ -19,6 +20,7 @@ with DAG(dag_id='ner', schedule_interval='0 0 * * *', default_args=cfg.default_c
     )
 
     task_ner = KubernetesPodOperator(
+        namespace="abb",
         name="ner-transform-ner",
         image=cfg.pipeline_args.image,
         task_id="ner",
@@ -30,6 +32,7 @@ with DAG(dag_id='ner', schedule_interval='0 0 * * *', default_args=cfg.default_c
     )
 
     task_save = KubernetesPodOperator(
+        namespace="abb",
         name="ner-save",
         image=cfg.pipeline_args.image,
         task_id="save",
