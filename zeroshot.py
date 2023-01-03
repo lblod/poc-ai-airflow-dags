@@ -18,6 +18,7 @@ with DAG(dag_id='zeroshot', schedule_interval='0 0 * * *', default_args=cfg.defa
             cfg.pipeline_args.load_taxo_query,
             "bbc_taxo"
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
@@ -33,6 +34,7 @@ with DAG(dag_id='zeroshot', schedule_interval='0 0 * * *', default_args=cfg.defa
             cfg.pipeline_args.load_query,
             "export"
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
@@ -49,6 +51,7 @@ with DAG(dag_id='zeroshot', schedule_interval='0 0 * * *', default_args=cfg.defa
         image=cfg.pipeline_args.image,
         task_id="zeroshot_bbc",
         cmds=["python3", "zeroshot.py"],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
@@ -57,6 +60,7 @@ with DAG(dag_id='zeroshot', schedule_interval='0 0 * * *', default_args=cfg.defa
         image=cfg.pipeline_args.image,
         task_id="save",
         cmds=["python3", "save.py", cfg.pipeline_args.sparql_endpoint],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 

@@ -17,6 +17,7 @@ with DAG(dag_id='bertopic-transform', schedule_interval='0 0 * * *', default_arg
             cfg.pipeline_args.sparql_endpoint,
             cfg.pipeline_args.load_query
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
@@ -28,6 +29,7 @@ with DAG(dag_id='bertopic-transform', schedule_interval='0 0 * * *', default_arg
             "python3",
             "transform.py"
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
@@ -40,6 +42,7 @@ with DAG(dag_id='bertopic-transform', schedule_interval='0 0 * * *', default_arg
             "save_transform.py",
             cfg.pipeline_args.sparql_endpoint
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 

@@ -17,6 +17,7 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
             cfg.pipeline_args.sparql_endpoint,
             cfg.pipeline_args.load_query
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
 
     )
@@ -29,6 +30,7 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
             "python3",
             "retrain.py"
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
@@ -46,6 +48,7 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
             "python3",
             "transform.py"
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
@@ -58,6 +61,7 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
             "save_topics.py",
             cfg.pipeline_args.sparql_endpoint,
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
@@ -70,6 +74,7 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
             "save_transform.py",
             cfg.pipeline_args.sparql_endpoint,
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 

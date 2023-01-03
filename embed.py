@@ -16,6 +16,7 @@ with DAG(dag_id='embed', schedule_interval='0 0 * * *', default_args=cfg.default
             cfg.pipeline_args.load_query
         ],
         image_pull_policy="always",
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
@@ -27,6 +28,7 @@ with DAG(dag_id='embed', schedule_interval='0 0 * * *', default_args=cfg.default
             "python3",
             "embed.py"
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
@@ -39,6 +41,7 @@ with DAG(dag_id='embed', schedule_interval='0 0 * * *', default_args=cfg.default
             "save.py",
             cfg.pipeline_args.sparql_endpoint,
         ],
+        volumes=cfg.pipeline_args.volumes,
         volume_mounts=cfg.pipeline_args.mount
     )
 
