@@ -45,7 +45,7 @@ def create_config_from_yaml(file_name: str):
         image=config["image"],
         volumes=[k8s.V1Volume(name=obj["source"], persistent_volume_claim=k8s.V1PersistentVolumeClaimVolumeSource(claim_name=obj["source"])) for obj in config["mounts"]],
         mount=[k8s.V1VolumeMount(mount_path=f"/{obj['target']}", name=obj["source"]) for obj in config["mounts"]],
-        sparql_endpoint=config["sparql_endpoint"],
+        sparql_endpoint=Variable.get("SPARQL_ENDPOINT", default_var=config["sparql_endpoint"]),
         load_query=config["load_query"],
         load_taxo_query=config.get("load_taxo_query")
     )
