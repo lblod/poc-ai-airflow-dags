@@ -18,8 +18,8 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
             cfg.pipeline_args.load_query
         ],
         volumes=cfg.pipeline_args.volumes,
-        volume_mounts=cfg.pipeline_args.mount
-
+        volume_mounts=cfg.pipeline_args.mount,
+        image_pull_policy="Always"
     )
 
     task_retrain_and_save = KubernetesPodOperator(
@@ -34,10 +34,14 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
         volume_mounts=cfg.pipeline_args.mount
     )
 
-    restart_operator = BashOperator(
-        task_id='reboot-topic-api',
-        bash_command= 'curl -X POST "http://docker-socket-proxy:2375/containers/lblod-bertopic-api/restart"',
-
+    task_restart_api = KubernetesPodOperator(
+        name="abb-bertopic-restart-api",
+        image=cfg.pipeline_args.image,
+        task_id="restart_api",
+        cmds=[
+            "python3",
+            "restart_api.py"
+        ]
     )
 
     task_transform = KubernetesPodOperator(
@@ -78,4 +82,4 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
         volume_mounts=cfg.pipeline_args.mount
     )
 
-    task_load >> task_retrain_and_save >> restart_operator >> task_transform >> [task_save_transform, task_save_topics]
+    task_load >> task_retrain_and_save >> task_restart_api >> task_transform >> [task_save_transform, task_save_topics]
