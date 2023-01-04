@@ -1,6 +1,6 @@
 from airflow import DAG
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
-from utils.utils import load_bertopic_transform_conf
+from config import load_bertopic_transform_conf
 
 
 cfg = load_bertopic_transform_conf()

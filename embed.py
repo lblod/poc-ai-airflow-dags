@@ -1,6 +1,6 @@
 from airflow import DAG
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
-from utils.utils import load_embed_config
+from config import load_embed_config
 
 cfg = load_embed_config()
 
