@@ -1,7 +1,7 @@
 from airflow import DAG
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 
-from utils import load_zeroshot_config
+from utils.utils import load_zeroshot_config
 
 cfg = load_zeroshot_config()
 
