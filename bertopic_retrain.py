@@ -7,6 +7,7 @@ cfg = load_bertopic_retrain_conf()
 with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=cfg.default_config._asdict(), catchup=False) as dag:
 
     task_load = KubernetesPodOperator(
+        namespace="abb",
         name="abb-bertopic-load",
         image=cfg.pipeline_args.image,
         task_id="load",
@@ -22,6 +23,7 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
     )
 
     task_retrain_and_save = KubernetesPodOperator(
+        namespace="abb",
         name="abb-bertopic-retrain",
         image=cfg.pipeline_args.image,
         task_id="retrain",
@@ -34,6 +36,7 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
     )
 
     task_restart_api = KubernetesPodOperator(
+        namespace="abb",
         name="abb-bertopic-restart-api",
         image=cfg.pipeline_args.image,
         task_id="restart_api",
@@ -44,6 +47,7 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
     )
 
     task_transform = KubernetesPodOperator(
+        namespace="abb",
         name="abb-bertopic-transform",
         image=cfg.pipeline_args.image,
         task_id="transform",
@@ -56,6 +60,7 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
     )
 
     task_save_topics = KubernetesPodOperator(
+        namespace="abb",
         name="abb-bertopic-save_topics",
         image=cfg.pipeline_args.image,
         task_id="save_topics",
@@ -69,6 +74,7 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
     )
 
     task_save_transform = KubernetesPodOperator(
+        namespace="abb",
         name="abb-bertopic-save_transform",
         image=cfg.pipeline_args.image,
         task_id="save_documents",

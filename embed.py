@@ -6,6 +6,7 @@ cfg = load_embed_config()
 
 with DAG(dag_id='embed', schedule_interval='0 0 * * *', default_args=cfg.default_config._asdict(), catchup=False) as dag:
     task_load = KubernetesPodOperator(
+        namespace="abb",
         name="embed-load",
         image=cfg.pipeline_args.image,
         task_id="load",
@@ -21,6 +22,7 @@ with DAG(dag_id='embed', schedule_interval='0 0 * * *', default_args=cfg.default
     )
 
     task_embed = KubernetesPodOperator(
+        namespace="abb",
         name="embed-embedding",
         image=cfg.pipeline_args.image,
         task_id="embed",
@@ -33,6 +35,7 @@ with DAG(dag_id='embed', schedule_interval='0 0 * * *', default_args=cfg.default
     )
 
     task_save = KubernetesPodOperator(
+        namespace="abb",
         name="embed-save",
         image=cfg.pipeline_args.image,
         task_id="save",

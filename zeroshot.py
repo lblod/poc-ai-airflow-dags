@@ -8,6 +8,7 @@ cfg = load_zeroshot_config()
 with DAG(dag_id='zeroshot', schedule_interval='0 0 * * *', default_args=cfg.default_config._asdict(),
          catchup=False) as dag:
     task_load_taxo = KubernetesPodOperator(
+        namespace="abb",
         name="abb-load-bbc",
         image=cfg.pipeline_args.image,
         task_id="load-bbc",
@@ -24,6 +25,7 @@ with DAG(dag_id='zeroshot', schedule_interval='0 0 * * *', default_args=cfg.defa
 
     # Tasks dynamically generated
     task_load = KubernetesPodOperator(
+        namespace="abb",
         name="abb-load-docs",
         image=cfg.pipeline_args.image,
         task_id="load-docs",
@@ -47,6 +49,7 @@ with DAG(dag_id='zeroshot', schedule_interval='0 0 * * *', default_args=cfg.defa
     # )
 
     task_zs_bbc = KubernetesPodOperator(
+        namespace="abb",
         name="abb-zeroshot",
         image=cfg.pipeline_args.image,
         task_id="zeroshot_bbc",
@@ -56,6 +59,7 @@ with DAG(dag_id='zeroshot', schedule_interval='0 0 * * *', default_args=cfg.defa
     )
 
     task_save = KubernetesPodOperator(
+        namespace="abb",
         name="abb-save",
         image=cfg.pipeline_args.image,
         task_id="save",

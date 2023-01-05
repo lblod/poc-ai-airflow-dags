@@ -8,6 +8,7 @@ cfg = load_bertopic_transform_conf()
 with DAG(dag_id='bertopic-transform', schedule_interval='0 0 * * *', default_args=cfg.default_config._asdict(), catchup=False) as dag:
 
     task_load = KubernetesPodOperator(
+        namespace="abb",
         name="abb-embed-bertopic-load",
         image=cfg.pipeline_args.image,
         task_id="load",
@@ -22,6 +23,7 @@ with DAG(dag_id='bertopic-transform', schedule_interval='0 0 * * *', default_arg
     )
 
     task_transform = KubernetesPodOperator(
+        namespace="abb",
         name="abb-embed-bertopic-transform",
         image=cfg.pipeline_args.image,
         task_id="transform",
@@ -34,6 +36,7 @@ with DAG(dag_id='bertopic-transform', schedule_interval='0 0 * * *', default_arg
     )
 
     task_save = KubernetesPodOperator(
+        namespace="abb",
         name="abb-embed-bertopic-save",
         image=cfg.pipeline_args.image,
         task_id="save",
