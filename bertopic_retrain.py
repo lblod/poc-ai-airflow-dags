@@ -43,7 +43,8 @@ with DAG(dag_id='bertopic-retrain', schedule_interval='0 0 1 * *', default_args=
         cmds=[
             "python3",
             "restart_api.py"
-        ]
+        ],
+        service_account_name="bertopic-service-account"
     )
 
     task_transform = KubernetesPodOperator(
