@@ -4,7 +4,7 @@ from kubernetes.client import models as k8s
 import yaml
 
 def get_config_path():
-    config_path = Variable.get("CONFIG_PATH", default_var="/opt/airflow/git/dags/configs")
+    config_path = Variable.get("CONFIG_PATH", default_var="/opt/airflow/dags/repo/configs")
     print("==="*25, f"\n{config_path}\n", "==="*25)
     return config_path
 
