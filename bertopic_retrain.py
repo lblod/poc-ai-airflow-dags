@@ -1,7 +1,6 @@
 from airflow import DAG
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
-from airflow.operators.bash import BashOperator
-from config import load_bertopic_retrain_conf
+from utils import load_bertopic_retrain_conf
 
 cfg = load_bertopic_retrain_conf()
 
