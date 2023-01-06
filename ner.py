@@ -17,7 +17,8 @@ with DAG(dag_id='ner', schedule_interval='0 0 * * *', default_args=cfg.default_c
             cfg.pipeline_args.load_query
         ],
         volumes=cfg.pipeline_args.volumes,
-        volume_mounts=cfg.pipeline_args.mount
+        volume_mounts=cfg.pipeline_args.mount,
+        image_pull_policy="Always"
     )
 
     task_ner = KubernetesPodOperator(

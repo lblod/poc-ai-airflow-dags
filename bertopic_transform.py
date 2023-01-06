@@ -19,7 +19,8 @@ with DAG(dag_id='bertopic-transform', schedule_interval='0 0 * * *', default_arg
             cfg.pipeline_args.load_query
         ],
         volumes=cfg.pipeline_args.volumes,
-        volume_mounts=cfg.pipeline_args.mount
+        volume_mounts=cfg.pipeline_args.mount,
+        image_pull_policy="Always"
     )
 
     task_transform = KubernetesPodOperator(

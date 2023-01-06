@@ -20,7 +20,8 @@ with DAG(dag_id='zeroshot', schedule_interval='0 0 * * *', default_args=cfg.defa
             "bbc_taxo"
         ],
         volumes=cfg.pipeline_args.volumes,
-        volume_mounts=cfg.pipeline_args.mount
+        volume_mounts=cfg.pipeline_args.mount,
+        image_pull_policy="Always"
     )
 
     # Tasks dynamically generated
